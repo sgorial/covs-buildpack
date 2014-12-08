@@ -72,18 +72,5 @@ echo "Creating start script"
 cat > "$BUILD_DIR/start.sh" <<EOF
 #!/bin/bash
 #
-# Download OpenJDK
-mkdir openjdk/
-cd openjdk/
-wget http://download.run.pivotal.io/openjdk/mountainlion/x86_64/openjdk-1.8.0_25.tar.gz && tar -xvzf openjdk-1.8.0_25.tar.gz
-cd ../
-#export JAVA_HOME=pwd/openjdk-1.8.0_25/
-
-# Download and start Tomcat container
-mkdir tomcat/
-cd tomcat/
-wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tomcat-7.0.47.tar.gz
-cd ../
-
 EOF
 chmod 755 "$BUILD_DIR/start.sh"
