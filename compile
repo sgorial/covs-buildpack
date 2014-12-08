@@ -85,33 +85,5 @@ cd tomcat/
 wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tomcat-7.0.47.tar.gz
 cd ../
 
-# Download and install/start Apache HTTPd server
-mkdir apache/
-cd apache/
-wget https://dl.dropbox.com/s/41fyqax01iqf0l7/apache_2.2.14_rh5_64.tar.gz && tar -xvzf apache_2.2.14_rh5_64.tar.gz
-cd ../
-
-wget https://ftp.gnu.org/gnu/libtool/libtool-1.5.6.tar.gz && tar -xvzf libtool-1.5.6.tar.gz
-cd libtool-1.5.6/
-./configure
-make
-make install
-
-cd ../
-
-wget http://sourceforge.net/projects/pcre/files/pcre/8.36/pcre-8.36.tar.gz && tar -xvzf pcre-8.36.tar.gz
-cd pcre-8.36/
-./configure --prefix=pwd/pcre
-make
-make install
-
-cd ../
-
-./configure --prefix=pwd/apache --with-included-apr --with-pcre=pwd/pcre/bin/pcre-config
-make
-make install
-touch pwd/apache/logs/access_log
-touch pwd/apache/logs/error_log
-sh -x pwd/apache/bin/apachectl start
 EOF
 chmod 755 "$BUILD_DIR/start.sh"
