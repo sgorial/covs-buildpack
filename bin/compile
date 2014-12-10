@@ -86,21 +86,21 @@ echo "Creating start script"
 cat > "$BUILD_DIR/start.sh" <<EOF
 #!/bin/bash
 #
+cd /home/vcap/app
 
 curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
 . bin/java
 
 # create default system.properties 
-if [ ! -f ${BUILD_DIR}/system.properties ]; then
-  echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
+if [ ! -f /home/vcap/app/system.properties ]; then
+  echo "java.runtime.version=1.6" > /home/vcap/app/system.properties
 fi
 
 # install JDK 
-javaVersion=$(detect_java_version ${BUILD_DIR})
+javaVersion=$(detect_java_version /home/vcap/app)
 echo -n "-----> Installing OpenJDK ${javaVersion}..."
-install_java ${BUILD_DIR} ${javaVersion}
-jdk_overlay ${BUILD_DIR}
-echo " done"
+install_java /home/vcap/app ${javaVersion}
+jdk_overlay /home/vcap/app
 
 # Download Tomcat container
 wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tomcat-7.0.47.tar.gz
