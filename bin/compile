@@ -121,8 +121,8 @@ perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/extra/httpd-vhost
 #perl -i -pe 's/8080/'\$PORT'/' /home/vcap/app/apache-tomcat/conf/server.xml
 
 /home/vcap/app/apache-tomcat/bin/catalina.sh run
-#/home/vcap/app/apache/bin/apachectl start
-#/home/vcap/app/apache/bin/apachectl restart
+/home/vcap/app/apache/bin/apachectl start
+/home/vcap/app/apache/bin/apachectl restart
 printenv
 
 EOF
