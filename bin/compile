@@ -112,8 +112,8 @@ rm tomcat-7.0.47.tar.gz
 
 /home/vcap/app/apache-tomcat/bin/catalina.sh start
 
-wget https://www.dropbox.com/s/y8i1znzq3hp811v/compiled.tar.gz
-tar -xvzf compiled.tar.gz
+wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz
+tar -xvzf compiled_source.tar.gz
 ls -lrt /home/vcap/app/apache/bin
 perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/httpd.conf
 perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/httpd.conf
