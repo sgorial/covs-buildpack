@@ -111,17 +111,17 @@ wget https://www.dropbox.com/s/53m264u0oxv5tan/tif-cca-3.28.1.war
 mv tif-cca-3.28.1.war ROOT.war
 rm tomcat-7.0.47.tar.gz
 
+/home/vcap/app/apache-tomcat/bin/catalina.sh start
+
 wget https://www.dropbox.com/s/y8i1znzq3hp811v/compiled.tar.gz
 tar -xvzf compiled.tar.gz
-ls -lrt
+ls -lrt /home/vcap/app/apache/bin
 perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/httpd.conf
 perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/httpd.conf
 perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/extra/httpd-vhosts.conf
 #perl -i -pe 's/8080/'\$PORT'/' /home/vcap/app/apache-tomcat/conf/server.xml
 
-/home/vcap/app/apache-tomcat/bin/catalina.sh start
-/home/vcap/app/apache/bin/apachectl start
-/home/vcap/app/apache/bin/apachectl restart
+/home/vcap/app/apache/bin/httpd -k start
 printenv
 
 EOF
