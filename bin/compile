@@ -124,10 +124,8 @@ wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tom
 #wget https://www.dropbox.com/s/53m264u0oxv5tan/tif-cca-3.28.1.war
 #mv tif-cca-3.28.1.war ROOT.war
 #rm tomcat-7.0.47.tar.gz
-
-#sh -x /home/vcap/app/apache-tomcat-7.0.47/bin/catalina.sh start
-sh -x /home/vcap/app/apache/bin/apachectl start
-sh -x /home/vcap/app/apache/bin/apachectl stop
+cat /home/vcap/app/apache/logs/error_log
+sh -x /home/vcap/app/apache-tomcat-7.0.47/bin/catalina.sh start
 sh -x /home/vcap/app/apache/bin/apachectl start
 cat /home/vcap/app/apache/logs/error_log
 netstat -ap
