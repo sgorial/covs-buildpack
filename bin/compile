@@ -127,7 +127,6 @@ sh -x /home/vcap/app/apache/bin/apachectl start
 sh -x /home/vcap/app/apache/bin/apachectl stop
 sh -x /home/vcap/app/apache/bin/apachectl start
 cat /home/vcap/app/apache/logs/error_log
-#curl apache.cf.covisintrnd.com:${$PORT}
 netstat -ap
 ps aux
 printenv
