@@ -125,7 +125,8 @@ wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tom
 #sh -x /home/vcap/app/apache-tomcat-7.0.47/bin/catalina.sh start
 sh -x /home/vcap/app/apache/bin/apachectl start
 cat /home/vcap/app/apache/logs/error_log
-#sh -x /home/vcap/app/apache/bin/apachectl restart
+curl apache.cf.covisintrnd.com
+curl apache.cf.covisintrnd.com:$PORT
 netstat -ap
 ps aux
 printenv
