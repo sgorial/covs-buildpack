@@ -66,21 +66,20 @@ cat "$BUILD_DIR/staging_info.yml"
 
 cd ../
 pwd
-wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz && tar -xvzf compiled_source.tar.gz
-rm "$BUILD_DIR"/apache/logs/error_log
-rm "$BUILD_DIR"/apache/logs/access_log
-rm "$BUILD_DIR"/apache/accept.lock
+#wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz && tar -xvzf compiled_source.tar.gz
+#rm "$BUILD_DIR"/apache/logs/error_log
+#rm "$BUILD_DIR"/apache/logs/access_log
+#rm "$BUILD_DIR"/apache/accept.lock
 #rm /home/vcap/app/apache/logs/httpd.pid
-touch "$BUILD_DIR"/apache/logs/access_log
-touch "$BUILD_DIR"/apache/logs/error_log
+#touch "$BUILD_DIR"/apache/logs/access_log
+#touch "$BUILD_DIR"/apache/logs/error_log
 
-perl -i -pe 's/apache.cf.covisintrnd.com/0.0.0.0/' "$BUILD_DIR"/apache/conf/httpd.conf
-perl -i -pe 's/User root/#User daemon/' "$BUILD_DIR"/apache/conf/httpd.conf
+#perl -i -pe 's/apache.cf.covisintrnd.com/0.0.0.0/' "$BUILD_DIR"/apache/conf/httpd.conf
+#perl -i -pe 's/User root/#User daemon/' "$BUILD_DIR"/apache/conf/httpd.conf
 #perl -i -pe 's/PidFile/#PidFile/' "$BUILD_DIR"/apache/conf/httpd.conf
-perl -i -pe 's/Group root/#Group daemon/' "$BUILD_DIR"/apache/conf/httpd.conf
+#perl -i -pe 's/Group root/#Group daemon/' "$BUILD_DIR"/apache/conf/httpd.conf
 #perl -i -pe 's/VCAP_PORT/'\$PORT'/' "$BUILD_DIR"/apache/conf/httpd.conf
 #perl -i -pe 's/VCAP_PORT/'\$PORT'/' "$BUILD_DIR"/apache/conf/extra/httpd-vhosts.conf
-perl -i -pe 's/8080/'\$PORT'/' "$BUILD_DIR"/apache-tomcat/conf/server.xml
 
 curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
 . bin/java
@@ -98,6 +97,7 @@ jdk_overlay "$BUILD_DIR"
 
 # Download Tomcat container
 wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tomcat-7.0.47.tar.gz
+perl -i -pe 's/8080/'\$PORT'/' "$BUILD_DIR"/apache-tomcat/conf/server.xml
 #mv "/home/vcap/app/apache-tomcat-7.0.47/" "/home/vcap/app/apache-tomcat/"
 #rm -rf "/home/vcap/app/apache-tomcat/webapps/*"
 #cd "/home/vcap/app/apache-tomcat/webapps/"
@@ -112,7 +112,7 @@ cat > "$BUILD_DIR/start.sh" <<EOF
 #
 
 sh -x /home/vcap/app/apache-tomcat-7.0.47/bin/catalina.sh start
-cat /home/vcap/app/apache/logs/error_log
+#cat /home/vcap/app/apache/logs/error_log
 #sh -x /home/vcap/app/apache/bin/apachectl start
 
 netstat -ap
