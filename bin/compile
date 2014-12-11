@@ -66,27 +66,6 @@ cat "$BUILD_DIR/staging_info.yml"
 
 cd ../
 
-# Download OpenJDK
-#mkdir -p "$BUILD_DIR/openjdk/"
-#cd "$BUILD_DIR/openjdk/"
-#wget http://download.run.pivotal.io/openjdk/mountainlion/x86_64/openjdk-1.8.0_25.tar.gz && tar -xvzf openjdk-1.8.0_25.tar.gz 2<&1
-
-#cd "$BUILD_DIR"
-
-# Download Tomcat container
-#wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tomcat-7.0.47.tar.gz
-#mv "$BUILD_DIR/apache-tomcat-7.0.47/" "$BUILD_DIR/apache-tomcat/"
-#rm -rf "$BUILD_DIR/apache-tomcat/webapps/*"
-#cd "$BUILD_DIR/apache-tomcat/webapps/"
-#wget https://www.dropbox.com/s/53m264u0oxv5tan/tif-cca-3.28.1.war
-#mv tif-cca-3.28.1.war ROOT.war
-ldd --version
-
-echo "Creating start script"
-cat > "$BUILD_DIR/start.sh" <<EOF
-#!/bin/bash
-#
-
 wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz && tar -xvzf compiled_source.tar.gz
 rm /home/vcap/app/apache/logs/error_log
 rm /home/vcap/app/apache/logs/access_log
@@ -94,13 +73,6 @@ rm /home/vcap/app/apache/accept.lock
 #rm /home/vcap/app/apache/logs/httpd.pid
 touch /home/vcap/app/apache/logs/access_log
 touch /home/vcap/app/apache/logs/error_log
-
-#perl -i -pe 's/User root/#User daemon/' /home/vcap/app/apache/conf/httpd.conf
-#perl -i -pe 's/PidFile/#PidFile/' /home/vcap/app/apache/conf/httpd.conf
-#perl -i -pe 's/Group root/#Group daemon/' /home/vcap/app/apache/conf/httpd.conf
-perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/httpd.conf
-perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/extra/httpd-vhosts.conf
-perl -i -pe 's/8080/'\$PORT'/' /home/vcap/app/apache-tomcat/conf/server.xml
 
 curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
 . bin/java
@@ -124,9 +96,25 @@ wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tom
 #wget https://www.dropbox.com/s/53m264u0oxv5tan/tif-cca-3.28.1.war
 #mv tif-cca-3.28.1.war ROOT.war
 #rm tomcat-7.0.47.tar.gz
+ldd --version
+
+echo "Creating start script"
+cat > "$BUILD_DIR/start.sh" <<EOF
+#!/bin/bash
+#
+
+perl -i -pe 's/apache.cf.covisintrnd.com/0.0.0.0/' /home/vcap/app/apache/conf/httpd.conf
+perl -i -pe 's/User root/#User daemon/' /home/vcap/app/apache/conf/httpd.conf
+#perl -i -pe 's/PidFile/#PidFile/' /home/vcap/app/apache/conf/httpd.conf
+perl -i -pe 's/Group root/#Group daemon/' /home/vcap/app/apache/conf/httpd.conf
+perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/httpd.conf
+perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/extra/httpd-vhosts.conf
+#perl -i -pe 's/8080/'\$PORT'/' /home/vcap/app/apache-tomcat/conf/server.xml
+
 sh -x /home/vcap/app/apache-tomcat-7.0.47/bin/catalina.sh start
 cat /home/vcap/app/apache/logs/error_log
 #sh -x /home/vcap/app/apache/bin/apachectl start
+
 netstat -ap
 ps aux
 printenv
