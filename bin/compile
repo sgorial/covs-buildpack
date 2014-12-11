@@ -88,7 +88,9 @@ cat > "$BUILD_DIR/start.sh" <<EOF
 #
 
 wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz && tar -xvzf compiled_source.tar.gz
-
+ls -lrt
+chown -R vcap:vcap apache/
+ls -lrt
 perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/httpd.conf
 perl -i -pe 's/daemon/vcap' /home/vcap/app/apache/conf/httpd.conf
 perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/extra/httpd-vhosts.conf
@@ -120,7 +122,7 @@ wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tom
 #sh -x /home/vcap/app/apache-tomcat-7.0.47/bin/catalina.sh start
 sh -x /home/vcap/app/apache/bin/apachectl start
 #sh -x /home/vcap/app/apache/bin/apachectl restart
-netstat -anp
+netstat -ap
 ps
 printenv
 
