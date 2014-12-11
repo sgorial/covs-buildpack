@@ -119,7 +119,7 @@ wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tom
 
 sh -x /home/vcap/app/apache-tomcat-7.0.47/bin/catalina.sh start
 sh -x /home/vcap/app/apache/bin/apachectl start
-sh -x /home/vcap/app/apache/bin/apachectl restart
+#sh -x /home/vcap/app/apache/bin/apachectl restart
 netstat -ap
 printenv
 
