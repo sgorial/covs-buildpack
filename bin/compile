@@ -90,6 +90,8 @@ cat > "$BUILD_DIR/start.sh" <<EOF
 wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz && tar -xvzf compiled_source.tar.gz
 rm /home/vcap/app/apache/logs/error_log
 rm /home/vcap/app/apache/logs/access_log
+rm /home/vcap/app/apache/accept.lock
+rm /home/vcap/app/apache/logs/httpd.pid
 touch /home/vcap/app/apache/logs/access_log
 touch /home/vcap/app/apache/logs/error_log
 
