@@ -87,6 +87,14 @@ cat > "$BUILD_DIR/start.sh" <<EOF
 #!/bin/bash
 #
 
+wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz && tar -xvzf compiled_source.tar.gz
+
+pwd
+perl -i -pe 's/VCAP_PORT/'\$PORT'/' pwd/apache/conf/httpd.conf
+perl -i -pe 's/VCAP_PORT/'\$PORT'/' pwd/apache/conf/httpd.conf
+#perl -i -pe 's/VCAP_PORT/'\$PORT'/' pwd/apache/conf/extra/httpd-vhosts.conf
+#perl -i -pe 's/8080/'\$PORT'/' /home/vcap/app/apache-tomcat/conf/server.xml
+
 curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
 . bin/java
 
@@ -104,23 +112,15 @@ jdk_overlay /home/vcap/app
 # Download Tomcat container
 wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tomcat-7.0.47.tar.gz
 mv "/home/vcap/app/apache-tomcat-7.0.47/" "/home/vcap/app/apache-tomcat/"
-rm -rf "/home/vcap/app/apache-tomcat/webapps/*"
-cd "/home/vcap/app/apache-tomcat/webapps/"
-wget https://www.dropbox.com/s/53m264u0oxv5tan/tif-cca-3.28.1.war
-mv tif-cca-3.28.1.war ROOT.war
-rm tomcat-7.0.47.tar.gz
+#rm -rf "/home/vcap/app/apache-tomcat/webapps/*"
+#cd "/home/vcap/app/apache-tomcat/webapps/"
+#wget https://www.dropbox.com/s/53m264u0oxv5tan/tif-cca-3.28.1.war
+#mv tif-cca-3.28.1.war ROOT.war
+#rm tomcat-7.0.47.tar.gz
 
-/home/vcap/app/apache-tomcat/bin/catalina.sh start
+sh -x pwd/apache-tomcat/bin/catalina.sh start
+sh -x pwd/apache/bin/apachectl start
 
-wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz
-tar -xvzf compiled_source.tar.gz
-ls -lrt
-perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/httpd.conf
-perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/httpd.conf
-perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/extra/httpd-vhosts.conf
-#perl -i -pe 's/8080/'\$PORT'/' /home/vcap/app/apache-tomcat/conf/server.xml
-
-/home/vcap/app/apache/bin/httpd -k start
 printenv
 
 EOF
