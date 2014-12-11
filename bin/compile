@@ -91,16 +91,16 @@ wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz && tar -xv
 rm /home/vcap/app/apache/logs/error_log
 rm /home/vcap/app/apache/logs/access_log
 rm /home/vcap/app/apache/accept.lock
-rm /home/vcap/app/apache/logs/httpd.pid
+#rm /home/vcap/app/apache/logs/httpd.pid
 touch /home/vcap/app/apache/logs/access_log
 touch /home/vcap/app/apache/logs/error_log
 
-perl -i -pe 's/User root/#User daemon/' /home/vcap/app/apache/conf/httpd.conf
+#perl -i -pe 's/User root/#User daemon/' /home/vcap/app/apache/conf/httpd.conf
 #perl -i -pe 's/PidFile/#PidFile/' /home/vcap/app/apache/conf/httpd.conf
-perl -i -pe 's/Group root/#Group daemon/' /home/vcap/app/apache/conf/httpd.conf
+#perl -i -pe 's/Group root/#Group daemon/' /home/vcap/app/apache/conf/httpd.conf
 perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/httpd.conf
 perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/extra/httpd-vhosts.conf
-#perl -i -pe 's/8080/'\$PORT'/' /home/vcap/app/apache-tomcat/conf/server.xml
+perl -i -pe 's/8080/'\$PORT'/' /home/vcap/app/apache-tomcat/conf/server.xml
 
 curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
 . bin/java
