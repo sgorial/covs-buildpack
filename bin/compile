@@ -65,7 +65,7 @@ echo "Look for staging_info.yml file"
 cat "$BUILD_DIR/staging_info.yml"
 
 cd ../
-
+pwd
 wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz && tar -xvzf compiled_source.tar.gz
 rm "$BUILD_DIR"/apache/logs/error_log
 rm "$BUILD_DIR"/apache/logs/access_log
