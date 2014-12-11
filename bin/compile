@@ -67,26 +67,34 @@ cat "$BUILD_DIR/staging_info.yml"
 cd ../
 
 wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz && tar -xvzf compiled_source.tar.gz
-rm /home/vcap/app/apache/logs/error_log
-rm /home/vcap/app/apache/logs/access_log
-rm /home/vcap/app/apache/accept.lock
+rm "$BUILD_DIR"/apache/logs/error_log
+rm "$BUILD_DIR"/apache/logs/access_log
+rm "$BUILD_DIR"/apache/accept.lock
 #rm /home/vcap/app/apache/logs/httpd.pid
-touch /home/vcap/app/apache/logs/access_log
-touch /home/vcap/app/apache/logs/error_log
+touch "$BUILD_DIR"/apache/logs/access_log
+touch "$BUILD_DIR"/apache/logs/error_log
+
+perl -i -pe 's/apache.cf.covisintrnd.com/0.0.0.0/' "$BUILD_DIR"/apache/conf/httpd.conf
+perl -i -pe 's/User root/#User daemon/' "$BUILD_DIR"/apache/conf/httpd.conf
+#perl -i -pe 's/PidFile/#PidFile/' "$BUILD_DIR"/apache/conf/httpd.conf
+perl -i -pe 's/Group root/#Group daemon/' "$BUILD_DIR"/apache/conf/httpd.conf
+#perl -i -pe 's/VCAP_PORT/'\$PORT'/' "$BUILD_DIR"/apache/conf/httpd.conf
+#perl -i -pe 's/VCAP_PORT/'\$PORT'/' "$BUILD_DIR"/apache/conf/extra/httpd-vhosts.conf
+perl -i -pe 's/8080/'\$PORT'/' "$BUILD_DIR"/apache-tomcat/conf/server.xml
 
 curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
 . bin/java
 
 # create default system.properties 
-if [ ! -f /home/vcap/app/system.properties ]; then
-  echo "java.runtime.version=1.6" > /home/vcap/app/system.properties
+if [ ! -f "$BUILD_DIR"/system.properties ]; then
+  echo "java.runtime.version=1.6" > "$BUILD_DIR"/system.properties
 fi
 
 # install JDK 
 javaVersion=$(detect_java_version /home/vcap/app)
 echo -n "-----> Installing OpenJDK ${javaVersion}..."
-install_java /home/vcap/app ${javaVersion}
-jdk_overlay /home/vcap/app
+install_java "$BUILD_DIR" ${javaVersion}
+jdk_overlay "$BUILD_DIR"
 
 # Download Tomcat container
 wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tomcat-7.0.47.tar.gz
@@ -102,14 +110,6 @@ echo "Creating start script"
 cat > "$BUILD_DIR/start.sh" <<EOF
 #!/bin/bash
 #
-
-perl -i -pe 's/apache.cf.covisintrnd.com/0.0.0.0/' /home/vcap/app/apache/conf/httpd.conf
-perl -i -pe 's/User root/#User daemon/' /home/vcap/app/apache/conf/httpd.conf
-#perl -i -pe 's/PidFile/#PidFile/' /home/vcap/app/apache/conf/httpd.conf
-perl -i -pe 's/Group root/#Group daemon/' /home/vcap/app/apache/conf/httpd.conf
-perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/httpd.conf
-perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/extra/httpd-vhosts.conf
-#perl -i -pe 's/8080/'\$PORT'/' /home/vcap/app/apache-tomcat/conf/server.xml
 
 sh -x /home/vcap/app/apache-tomcat-7.0.47/bin/catalina.sh start
 cat /home/vcap/app/apache/logs/error_log
