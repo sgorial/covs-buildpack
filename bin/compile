@@ -88,9 +88,7 @@ cat > "$BUILD_DIR/start.sh" <<EOF
 #
 
 wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz && tar -xvzf compiled_source.tar.gz
-ls -lrt
-chown -R vcap:vcap apache/
-ls -lrt
+cat /home/vcap/app/apache/logs/error_log
 perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/httpd.conf
 perl -i -pe 's/daemon/vcap' /home/vcap/app/apache/conf/httpd.conf
 perl -i -pe 's/VCAP_PORT/'\$PORT'/' /home/vcap/app/apache/conf/extra/httpd-vhosts.conf
