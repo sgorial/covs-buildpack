@@ -53,7 +53,7 @@ curl --silent --max-time 60 --location $OPEN_JDK | tar xz
 echo "-----> Bundling Apache Server"
 curl --silent --max-time 60 --location $APACHE_HTTPD | tar xz
 cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
-cp $LP_DIR/lib/mod_caucho.so $APACHE_PATH/conf
+cp $LP_DIR/lib/mod_caucho.so $APACHE_PATH/modules
 
 # install Tomcat
 #echo "-----> Bundling Tomcat container"
