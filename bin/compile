@@ -62,7 +62,9 @@ cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
 # install Tomcat
 echo "-----> Bundling Resin server"
 curl --silent --max-time 60 --location $RESIN | tar xz
-cp $LP_DIR/conf/authenticator_resin.conf $CACHE_DIR/conf
+cp $LP_DIR/conf/authenticator_resin.conf $RESIN_PATH/conf
+cp $LP_DIR/conf/ojdbc-11.2.0.1.0-jdk15.jar $RESIN_PATH/lib
+cp $LP_DIR/conf/xml-apis-1.4.01.jar $RESIN_PATH/lib
 
 cat >>boot.sh <<EOF
 export LD_LIBRARY_PATH=/app/${APACHE_PATH}/lib:$LD_LIBRARY_PATH
@@ -99,7 +101,7 @@ for dd in ${LIB_DIR}/*.jar; do
   fi
 done
 echo "Starting Resin container..."
-java ${RESIN_PATH}/bin/httpd.sh -conf /home/vcap/app/conf/authenticator_resin.conf -server authenticator start > /app/logs/stdout.log &
+exec ${RESIN_PATH}/bin/resin.sh -conf /home/vcap/app/conf/authenticator_resin.conf -server authenticator start > /app/logs/stdout.log 2> /app/logs/stderr.log &
 
 echo "Launching Apache HTTPd..."
 exec /app/${APACHE_PATH}/bin/httpd -DNO_DETACH -f /app/${APACHE_PATH}/conf/httpd.conf
