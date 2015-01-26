@@ -25,14 +25,15 @@ shopt -s dotglob
 cd $BUILD_DIR
 
 # resources to overlay
-mkdir -p $CACHE_DIR/temp
-mv * $CACHE_DIR/temp
-mv $CACHE_DIR/temp .
+mkdir -p $CACHE_DIR/cache
+mv * $CACHE_DIR/cache
+mv $CACHE_DIR/cache .
 # create resources directory
 mkdir -p $CACHE_DIR/conf
 cp $LP_DIR/conf/webagent.conf $CACHE_DIR/conf
 cp $LP_DIR/conf/workers.properties $CACHE_DIR/conf
 cp $LP_DIR/conf/authn-client.conf $CACHE_DIR/conf
+cp $LP_DIR/conf/api-registrations-client.conf $CACHE_DIR/conf
 mv $CACHE_DIR/conf .
 # create logs directory
 mkdir -p $CACHE_DIR/logs
