@@ -1,122 +1,84 @@
 #!/usr/bin/env bash
 
-echo "Running cache test..."
+# fail fast
+set -e
+
+APACHE_HTTPD="https://www.dropbox.com/s/qllq85lc6s81ibi/apache-2.2.14-proxy.tar.gz"
+TOMCAT_CONTAINER="https://www.dropbox.com/s/1zzh5yvz05mljt9/tomcat.tar.gz"
+OPEN_JDK="https://s3.amazonaws.com/covisintrnd.com-software/jdk-8u25-linux-x64.gz"
+WEBAPP="https://s3.amazonaws.com/covisintrnd.com-software/sso.tar.gz"
+
+APACHE_PATH="apache-2.2.14-proxy"
+TOMCAT_PATH="tomcat"
+JDK_PATH="jdk1.8.0_25"
+WEBAPP_PATH="webroot"
+
 BUILD_DIR=$1
 CACHE_DIR=$2
-BUILD_PACK_DIR=$(dirname "$(dirname "$0")")
-echo "All arguments [*]"
+LP_DIR=`cd $(dirname $0); cd ..; pwd`
 
-if [ ! -d "$BUILD_DIR" ]; then
-  echo "Build directory [$BUILD_DIR] does not exist, creating"
-  mkdir -p "$BUILD_DIR"
-else
-  echo "Build directory [$BUILD_DIR] exists"
-  echo "Build directory contents..."
-  ls -lRh "$BUILD_DIR"
-fi
+# include .files when moving things around
+shopt -s dotglob
 
-if [ ! -d "$CACHE_DIR" ]; then
-  echo "Cache directory [$CACHE_DIR] does not exist, creating"
-  mkdir -p "$CACHE_DIR"
-else
-  echo "Cache directory [$CACHE_DIR] exists"
-fi
+cd $BUILD_DIR
 
-echo "The compile script is at [$0]"
-echo "The build pack is situated at [$BUILD_PACK_DIR]"
+# resources to overlay
+mkdir -p $CACHE_DIR/temp
+mv * $CACHE_DIR/temp
+mv $CACHE_DIR/temp .
+# create resources directory
+mkdir -p $CACHE_DIR/conf
+cp $LP_DIR/conf/webagent.conf $CACHE_DIR/conf
+cp $LP_DIR/conf/workers.properties $CACHE_DIR/conf
+cp $LP_DIR/conf/authn-client.conf $CACHE_DIR/conf
+mv $CACHE_DIR/conf .
+# create logs directory
+mkdir -p $CACHE_DIR/logs
+cp $LP_DIR/conf/mod_jk.log $CACHE_DIR/logs
+mv $CACHE_DIR/logs .
 
-echo "Moving to the cache dir..."
-cd "$CACHE_DIR"
-echo "Now in [$(pwd)]"
+# extract webapp directory root
+echo "-----> Bundling SSO webapp"
+curl --silent --max-time 60 --location $WEBAPP | tar xz
+cp $LP_DIR/conf/web.xml $WEBAPP_PATH/ROOT/WEB-INF
+cp $LP_DIR/conf/initial.properties $WEBAPP_PATH/ROOT/WEB-INF/classes
 
-echo "Directory listing:"
-ls -la
+# install Open JDK
+echo "-----> Bundling Open JDK"
+curl --silent --max-time 60 --location $OPEN_JDK | tar xz
 
-echo "Listing Build Pack Directory:"
-ls -la /tmp/buildpacks
+# install HTTPd
+echo "-----> Bundling Apache Server"
+curl --silent --max-time 60 --location $APACHE_HTTPD | tar xz
+cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
 
-echo "Listing Build Pack Cache:"
-ls -la "$BUILDPACK_CACHE"
+# install Tomcat
+echo "-----> Bundling Tomcat container"
+curl --silent --max-time 60 --location $TOMCAT_CONTAINER | tar xz
+wget http://central.maven.org/maven2/jstl/jstl/1.2/jstl-1.2.jar
+cp jstl-1.2.jar $TOMCAT_PATH/lib
 
-echo "Listing Environment:"
-env
+cat >>boot.sh <<EOF
+export LD_LIBRARY_PATH=/app/${APACHE_PATH}/lib:$LD_LIBRARY_PATH
+ln -s /home/vcap/app/conf conf
+sed -i 's/VCAP_PORT/'\$PORT'/' /app/${APACHE_PATH}/conf/httpd.conf
+sed -i 's/a01\/apps\/sso\/logs/app\/logs/' /app/${WEBAPP_PATH}/ROOT/WEB-INF/classes/log4j.properties
+for var in \`env|cut -f1 -d=\`; do
+  echo "PassEnv \$var" >> /app/${APACHE_PATH}/conf/httpd.conf;
+done
+touch /app/${APACHE_PATH}/logs/error_log
+touch /app/${APACHE_PATH}/logs/access_log
+touch /app/logs/sso.log
+tail -F /app/logs/sso.log &
+tail -F /app/logs/webagent-*.log &
+#tail -F /app/${APACHE_PATH}/logs/error_log &
+#tail -F /app/${APACHE_PATH}/logs/access_log &
+#tail -F /app/${TOMCAT_PATH}/logs/catalina.out &
 
-echo "Listing OS Info:"
-cat /etc/issue
-
-echo "Listing script versions:"
-python -V
-echo
-ruby -v
-echo
-perl -v
-
-echo "User Limits:"
-ulimit -a
-echo
-
-echo "CPU Info"
-cat /proc/cpuinfo
-
-echo "OS Version"
-cat /proc/version
-
-echo "Look for staging_info.yml file"
-cat "$BUILD_DIR/staging_info.yml"
-
-cd ../
-#wget https://www.dropbox.com/s/8pplwjs9bju4mfb/compiled_source.tar.gz && tar -xvzf compiled_source.tar.gz
-#rm "$BUILD_DIR"/apache/logs/error_log
-#rm "$BUILD_DIR"/apache/logs/access_log
-#rm "$BUILD_DIR"/apache/accept.lock
-#rm /home/vcap/app/apache/logs/httpd.pid
-#touch "$BUILD_DIR"/apache/logs/access_log
-#touch "$BUILD_DIR"/apache/logs/error_log
-
-#perl -i -pe 's/apache.cf.covisintrnd.com/0.0.0.0/' "$BUILD_DIR"/apache/conf/httpd.conf
-#perl -i -pe 's/User root/#User daemon/' "$BUILD_DIR"/apache/conf/httpd.conf
-#perl -i -pe 's/PidFile/#PidFile/' "$BUILD_DIR"/apache/conf/httpd.conf
-#perl -i -pe 's/Group root/#Group daemon/' "$BUILD_DIR"/apache/conf/httpd.conf
-#perl -i -pe 's/VCAP_PORT/'\$PORT'/' "$BUILD_DIR"/apache/conf/httpd.conf
-#perl -i -pe 's/VCAP_PORT/'\$PORT'/' "$BUILD_DIR"/apache/conf/extra/httpd-vhosts.conf
-
-curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
-. bin/java
-
-# create default system.properties 
-if [ ! -f "$BUILD_DIR"/system.properties ]; then
-  echo "java.runtime.version=1.6" > "$BUILD_DIR"/system.properties
-fi
-
-# install JDK 
-javaVersion=$(detect_java_version /home/vcap/app)
-echo -n "-----> Installing OpenJDK ${javaVersion}..."
-install_java "$BUILD_DIR" ${javaVersion}
-jdk_overlay "$BUILD_DIR"
-
-# Download Tomcat container
-wget http://download.run.pivotal.io/tomcat/tomcat-7.0.47.tar.gz && tar -xvzf tomcat-7.0.47.tar.gz
-perl -i -pe 's/8080/'\$PORT'/' apache-tomcat/conf/server.xml
-#mv "/home/vcap/app/apache-tomcat-7.0.47/" "/home/vcap/app/apache-tomcat/"
-#rm -rf "/home/vcap/app/apache-tomcat/webapps/*"
-#cd "/home/vcap/app/apache-tomcat/webapps/"
-#wget https://www.dropbox.com/s/53m264u0oxv5tan/tif-cca-3.28.1.war
-#mv tif-cca-3.28.1.war ROOT.war
-#rm tomcat-7.0.47.tar.gz
-ldd --version
-
-echo "Creating start script"
-cat > "$BUILD_DIR/start.sh" <<EOF
-#!/bin/bash
-#
-
-/home/vcap/app/apache-tomcat-7.0.47/bin/catalina.sh start
-#cat /home/vcap/app/apache/logs/error_log
-#sh -x /home/vcap/app/apache/bin/apachectl start
-
-netstat -ap
-ps aux
-printenv
-
+echo "Starting Tomcat..."
+export JAVA_HOME=/app/${JDK_PATH}
+export CATALINA_OPTS="-Dspring.profiles.active=prod -Dauthn-client.conf=/home/vcap/app/conf/authn-client.conf"
+exec /app/${TOMCAT_PATH}/bin/catalina.sh start &
+echo "Launching Apache HTTPd..."
+exec /app/${APACHE_PATH}/bin/httpd -DNO_DETACH -f /app/${APACHE_PATH}/conf/httpd.conf
 EOF
-chmod 755 "$BUILD_DIR/start.sh"
