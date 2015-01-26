@@ -33,11 +33,11 @@ mkdir -p $CACHE_DIR/conf
 cp $LP_DIR/conf/webagent.conf $CACHE_DIR/conf
 cp $LP_DIR/conf/workers.properties $CACHE_DIR/conf
 cp $LP_DIR/conf/authn-client.conf $CACHE_DIR/conf
+cp $LP_DIR/conf/authenticator_resin.conf $CACHE_DIR/conf
 cp $LP_DIR/conf/api-registrations-client.conf $CACHE_DIR/conf
 mv $CACHE_DIR/conf .
 # create logs directory
 mkdir -p $CACHE_DIR/logs
-cp $LP_DIR/conf/mod_jk.log $CACHE_DIR/logs
 mv $CACHE_DIR/logs .
 
 # extract webapp directory root
@@ -84,9 +84,8 @@ touch /app/logs/sso.log
 touch /app/logs/mod_jk.log
 tail -F /app/logs/sso.log &
 tail -F /app/logs/webagent-*.log &
-#tail -F /app/${APACHE_PATH}/logs/error_log &
-#tail -F /app/${APACHE_PATH}/logs/access_log &
-#tail -F /app/${TOMCAT_PATH}/logs/catalina.out &
+tail -F /app/${APACHE_PATH}/logs/error_log &
+tail -F /app/${APACHE_PATH}/logs/access_log &
 
 #echo "Starting Tomcat..."
 #export CATALINA_OPTS="-Dspring.profiles.active=prod -Dauthn-client.conf=/home/vcap/app/conf/authn-client.conf"
