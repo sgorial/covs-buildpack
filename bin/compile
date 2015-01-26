@@ -8,7 +8,6 @@ TOMCAT_CONTAINER="https://www.dropbox.com/s/1zzh5yvz05mljt9/tomcat.tar.gz"
 RESIN="http://caucho.com/download/resin-4.0.41.tar.gz"
 OPEN_JDK="https://s3.amazonaws.com/covisintrnd.com-software/jdk-8u25-linux-x64.gz"
 WEBAPP="https://s3.amazonaws.com/covisintrnd.com-software/sso.tar.gz"
-MOD_CAUCHO="https://www.dropbox.com/s/w22njex10zk6j41/mod_caucho.so"
 
 APACHE_PATH="apache-2.2.14-proxy"
 TOMCAT_PATH="tomcat"
@@ -54,9 +53,7 @@ curl --silent --max-time 60 --location $OPEN_JDK | tar xz
 echo "-----> Bundling Apache Server"
 curl --silent --max-time 60 --location $APACHE_HTTPD | tar xz
 cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
-curl --silent --max-time 60 --location $MOD_CAUCHO
-cp mod_caucho.so $APACHE_HTTPD/modules
-rm mod_caucho.so
+cp $LP_DIR/lib/mod_caucho.so $APACHE_PATH/conf
 
 # install Tomcat
 #echo "-----> Bundling Tomcat container"
@@ -66,8 +63,8 @@ rm mod_caucho.so
 echo "-----> Bundling Resin server"
 curl --silent --max-time 60 --location $RESIN | tar xz
 cp $LP_DIR/conf/authenticator_resin.conf $RESIN_PATH/conf
-cp $LP_DIR/conf/ojdbc-11.2.0.1.0-jdk15.jar $RESIN_PATH/lib
-cp $LP_DIR/conf/xml-apis-1.4.01.jar $RESIN_PATH/lib
+cp $LP_DIR/lib/ojdbc-11.2.0.1.0-jdk15.jar $RESIN_PATH/lib
+cp $LP_DIR/lib/xml-apis-1.4.01.jar $RESIN_PATH/lib
 
 cat >>boot.sh <<EOF
 export LD_LIBRARY_PATH=/app/${APACHE_PATH}/lib:$LD_LIBRARY_PATH
