@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+	<display-name>sso</display-name>
+
+    <context-param>
+        <param-name>xFrameOption</param-name>
+        <param-value>DENY</param-value>
+    </context-param>
+    
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath:application-context-config.xml
+            classpath:spring-authn-client.xml
+			classpath:application-context-core.xml
+			classpath:application-context-cache.xml
+			classpath:application-context-tif.xml
+			classpath:application-context-sso.xml
+            classpath:application-context-policies.xml
+			classpath:application-context-bl-core.xml
+			classpath:cfx-beans.xml
+		</param-value>
+	</context-param>
+
+    <filter>
+        <!-- Dapper-style span/trace id support: http://research.google.com/pubs/pub36356.html -->
+        <filter-name>TraceFilter</filter-name>
+        <filter-class>com.covisint.idm.support.core.http.servlet.SpanFilter</filter-class>
+        <init-param>
+            <param-name>spanName</param-name>
+            <param-value>sso</param-value>
+        </init-param>
+        <!-- Uncomment following params to change the default headers used. -->
+        <!--  
+        <init-param>
+            <param-name>traceIdHeaderName</param-name>
+            <param-value>X-Trace</param-value>
+        </init-param>
+        <init-param>
+            <param-name>spanIdHeaderName</param-name>
+            <param-value>X-Span</param-value>
+        </init-param>
+        -->
+    </filter>
+
+    <filter-mapping>
+        <filter-name>TraceFilter</filter-name>
+        <servlet-name>sso</servlet-name>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>XFrameOptionsFilter</filter-name>
+        <filter-class>com.covisint.idm.support.core.http.servlet.XFrameOptionsFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>XFrameOptionsFilter</filter-name>
+        <servlet-name>sso</servlet-name>
+    </filter-mapping>
+        	
+	<filter>
+		<filter-name>contextFilter</filter-name>
+		<filter-class>
+			org.springframework.web.filter.DelegatingFilterProxy
+		</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>contextFilter</filter-name>
+		<servlet-name>sso</servlet-name>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>contextFilter</filter-name>
+		<servlet-name>CXFServlet</servlet-name>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>contextFilter</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
+	<!-- Added for IDM-3715 -->
+	<filter-mapping>
+		<filter-name>contextFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+  	<filter>
+		<filter-name>SecurityFilter</filter-name>
+		<filter-class>com.covisint.css.core.web.security.SecurityFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>SecurityFilter</filter-name>
+		<servlet-name>sso</servlet-name>
+	</filter-mapping>
+
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+		
+	<servlet>
+		<servlet-name>sso</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:sso-servlet.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>sso</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>CXFServlet</servlet-name>
+		<servlet-class>
+			org.apache.cxf.transport.servlet.CXFServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>CXFServlet</servlet-name>
+		<url-pattern>/rs/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- Setting Error pages on 500 or 404 errors -->
+
+          <error-page>
+                    <error-code>500</error-code>
+                    <location>/def/jsp/errors/serverErrorPage.jsp</location>
+          </error-page>
+
+          <error-page>
+                    <error-code>404</error-code>
+                    <location>/def/jsp/errors/serverErrorPage.jsp</location>
+          </error-page>
+
+
+</web-app>
