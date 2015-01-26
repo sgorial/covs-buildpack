@@ -34,7 +34,6 @@ cp $LP_DIR/conf/webagent.conf $CACHE_DIR/conf
 cp $LP_DIR/conf/workers.properties $CACHE_DIR/conf
 cp $LP_DIR/conf/authn-client.conf $CACHE_DIR/conf
 cp $LP_DIR/conf/authenticator_resin.conf $CACHE_DIR/conf
-cp $LP_DIR/conf/api-registrations-client.conf $CACHE_DIR/conf
 mv $CACHE_DIR/conf .
 # create logs directory
 mkdir -p $CACHE_DIR/logs
