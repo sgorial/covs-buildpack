@@ -5,13 +5,10 @@ set -e
 
 APACHE_HTTPD="https://www.dropbox.com/s/qllq85lc6s81ibi/apache-2.2.14-proxy.tar.gz"
 TOMCAT_CONTAINER="https://www.dropbox.com/s/1zzh5yvz05mljt9/tomcat.tar.gz"
-#RESIN="http://caucho.com/download/resin-4.0.41.tar.gz"
 OPEN_JDK="https://s3.amazonaws.com/covisintrnd.com-software/jdk-8u25-linux-x64.gz"
-WEBAPP="https://s3.amazonaws.com/covisintrnd.com-software/sso.tar.gz"
 
 APACHE_PATH="apache-2.2.14-proxy"
 TOMCAT_PATH="tomcat"
-#RESIN_PATH="resin-4.0.41"
 JDK_PATH="jdk1.8.0_25"
 WEBAPP_PATH="webroot"
 
@@ -24,7 +21,7 @@ shopt -s dotglob
 
 cd $BUILD_DIR
 
-# resources to overlay
+# webapp root
 mkdir -p $CACHE_DIR/webroot
 mv * $CACHE_DIR/webroot
 mv $CACHE_DIR/webroot .
@@ -32,19 +29,10 @@ mv $CACHE_DIR/webroot .
 mkdir -p $CACHE_DIR/conf
 cp $LP_DIR/conf/webagent.conf $CACHE_DIR/conf
 cp $LP_DIR/conf/workers.properties $CACHE_DIR/conf
-#cp $LP_DIR/conf/authn-client.conf $CACHE_DIR/conf
-#cp $LP_DIR/conf/api-registrations-client.conf $CACHE_DIR/conf
-#cp $LP_DIR/conf/authenticator_resin.conf $CACHE_DIR/conf
 mv $CACHE_DIR/conf .
 # create logs directory
 mkdir -p $CACHE_DIR/logs
 mv $CACHE_DIR/logs .
-
-# extract webapp directory root
-#echo "-----> Bundling SSO webapp"
-#curl --silent --max-time 60 --location $WEBAPP | tar xz
-#cp $LP_DIR/conf/web.xml $WEBAPP_PATH/ROOT/WEB-INF
-#cp $LP_DIR/conf/initial.properties $WEBAPP_PATH/ROOT/WEB-INF/classes
 
 # install Open JDK
 echo "-----> Bundling Open JDK"
@@ -54,18 +42,10 @@ curl --silent --max-time 60 --location $OPEN_JDK | tar xz
 echo "-----> Bundling Apache Server"
 curl --silent --max-time 60 --location $APACHE_HTTPD | tar xz
 cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
-#cp $LP_DIR/lib/mod_caucho.so $APACHE_PATH/modules
 
 # install Tomcat
 echo "-----> Bundling Tomcat container"
 curl --silent --max-time 60 --location $TOMCAT_CONTAINER | tar xz
-
-# install Tomcat
-#echo "-----> Bundling Resin server"
-#curl --silent --max-time 60 --location $RESIN | tar xz
-#cp $LP_DIR/conf/authenticator_resin.conf $RESIN_PATH/conf
-#cp $LP_DIR/lib/ojdbc-11.2.0.1.0-jdk15.jar $RESIN_PATH/lib
-#cp $LP_DIR/lib/xml-apis-1.4.01.jar $RESIN_PATH/lib
 
 cat >>boot.sh <<EOF
 export LD_LIBRARY_PATH=/app/${APACHE_PATH}/lib:$LD_LIBRARY_PATH
@@ -74,7 +54,6 @@ export PATH="$JAVA_HOME/bin:$PATH"
 
 ln -s /home/vcap/app/conf conf
 sed -i 's/VCAP_PORT/'\$PORT'/' /app/${APACHE_PATH}/conf/httpd.conf
-#sed -i 's/a01\/apps\/sso\/logs/app\/logs/' /app/${WEBAPP_PATH}/ROOT/WEB-INF/classes/log4j.properties
 for var in \`env|cut -f1 -d=\`; do
   echo "PassEnv \$var" >> /app/${APACHE_PATH}/conf/httpd.conf;
 done
@@ -83,24 +62,11 @@ touch /app/${APACHE_PATH}/logs/error_log
 touch /app/${APACHE_PATH}/logs/access_log
 #touch /app/logs/sso.log
 touch /app/logs/mod_jk.log
-#tail -F /app/logs/sso.log &
 tail -F /app/${APACHE_PATH}/logs/error_log &
 tail -F /app/${APACHE_PATH}/logs/access_log &
 
 #echo "Starting Tomcat..."
-#export CATALINA_OPTS="-Dspring.profiles.active=prod -Dauthn-client.conf=/home/vcap/app/conf/authn-client.conf"
 exec /app/${TOMCAT_PATH}/bin/catalina.sh start &
-
-#RESIN_HOME=/app/resin-4.0.41
-#CLASSPATH=$RESIN_HOME/lib
-#LIB_DIR=$RESIN_HOME/lib
-#for dd in ${LIB_DIR}/*.jar; do
-#  if [ "${dd}" != "${LIB_DIR}/*.jar" ]; then
-#    CLASSPATH=${CLASSPATH}:${dd}
-#  fi
-#done
-#echo "Starting Resin container..."
-#exec ${RESIN_PATH}/bin/resin.sh -conf /home/vcap/app/conf/authenticator_resin.conf -server authenticator start > /app/logs/stdout.log 2> /app/logs/stderr.log &
 
 echo "Launching Apache HTTPd..."
 exec /app/${APACHE_PATH}/bin/httpd -DNO_DETACH -f /app/${APACHE_PATH}/conf/httpd.conf
