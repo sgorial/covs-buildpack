@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Could be better...
-if [ -f $1/*.zip ]; then
+if [ -f $1/*.war ]; then
   echo "Java" && exit 0
 else
   echo "no" && exit 1
