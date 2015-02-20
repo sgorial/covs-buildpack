@@ -48,6 +48,8 @@ cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
 # install Tomcat
 echo "-----> Bundling Tomcat container"
 curl --silent --max-time 60 --location $TOMCAT_CONTAINER | tar xz
+cp $LP_DIR/conf/server.xml $TOMCAT_PATH/conf
+cp $LP_DIR/conf/workers.properties $TOMCAT_PATH/conf
 
 cat >>boot.sh <<EOF
 export LD_LIBRARY_PATH=/app/${APACHE_PATH}/lib:$LD_LIBRARY_PATH
