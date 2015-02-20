@@ -23,9 +23,9 @@ shopt -s dotglob
 cd $BUILD_DIR
 
 # webapp root
-mkdir -p $CACHE_DIR/webroot
-mv * $CACHE_DIR/webroot
-mv $CACHE_DIR/webroot .
+#mkdir -p $CACHE_DIR/webroot
+#mv * $CACHE_DIR/webroot
+#mv $CACHE_DIR/webroot .
 # create resources directory
 mkdir -p $CACHE_DIR/conf
 cp $LP_DIR/conf/webagent.conf $CACHE_DIR/conf
@@ -38,10 +38,10 @@ mkdir -p $CACHE_DIR/logs
 mv $CACHE_DIR/logs .
 
 # extract webapp directory root
-echo "-----> Bundling SSO webapp"
-curl --silent --max-time 60 --location $WEBAPP | tar xz
-cp $LP_DIR/conf/web.xml $WEBAPP_PATH/ROOT/WEB-INF
-cp $LP_DIR/conf/initial.properties $WEBAPP_PATH/ROOT/WEB-INF/classes
+#echo "-----> Bundling SSO webapp"
+#curl --silent --max-time 60 --location $WEBAPP | tar xz
+#cp $LP_DIR/conf/web.xml $WEBAPP_PATH/ROOT/WEB-INF
+#cp $LP_DIR/conf/initial.properties $WEBAPP_PATH/ROOT/WEB-INF/classes
 
 # install Open JDK
 echo "-----> Bundling Open JDK"
