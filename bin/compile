@@ -6,7 +6,6 @@ set -e
 APACHE_HTTPD="https://www.dropbox.com/s/qllq85lc6s81ibi/apache-2.2.14-proxy.tar.gz"
 TOMCAT_CONTAINER="https://www.dropbox.com/s/1zzh5yvz05mljt9/tomcat.tar.gz"
 OPEN_JDK="https://s3.amazonaws.com/covisintrnd.com-software/jdk-8u25-linux-x64.gz"
-WEBAPP="https://s3.amazonaws.com/covisintrnd.com-software/sso.tar.gz"
 
 APACHE_PATH="apache-2.2.14-proxy"
 TOMCAT_PATH="tomcat"
@@ -17,31 +16,24 @@ BUILD_DIR=$1
 CACHE_DIR=$2
 LP_DIR=`cd $(dirname $0); cd ..; pwd`
 
-# include .files when moving things around
-shopt -s dotglob
-
 cd $BUILD_DIR
 
-# webapp root
+# create webapp root directory
 mkdir -p $CACHE_DIR/webroot
 mv * $CACHE_DIR/webroot
 mv $CACHE_DIR/webroot .
-# create resources directory
+
+# create resource directory
 mkdir -p $CACHE_DIR/conf
 cp $LP_DIR/conf/webagent.conf $CACHE_DIR/conf
 cp $LP_DIR/conf/workers.properties $CACHE_DIR/conf
 cp $LP_DIR/conf/authn-client.conf $CACHE_DIR/conf
 cp $LP_DIR/conf/api-registrations-client.conf $CACHE_DIR/conf
 mv $CACHE_DIR/conf .
+
 # create logs directory
 mkdir -p $CACHE_DIR/logs
 mv $CACHE_DIR/logs .
-
-# extract webapp directory root
-#echo "-----> Bundling SSO webapp"
-#curl --silent --max-time 60 --location $WEBAPP | tar xz
-#cp $LP_DIR/conf/web.xml $WEBAPP_PATH/ROOT/WEB-INF
-#cp $LP_DIR/conf/initial.properties $WEBAPP_PATH/ROOT/WEB-INF/classes
 
 # install Open JDK
 echo "-----> Bundling Open JDK"
@@ -74,6 +66,8 @@ touch /app/logs/sso.log
 touch /app/logs/mod_jk.log
 tail -F /app/${APACHE_PATH}/logs/error_log &
 tail -F /app/${APACHE_PATH}/logs/access_log &
+tail -F /app/logs/sso.log &
+tail -F /app/logs/mod_jk.log &
 
 #echo "Starting Tomcat..."
 export CATALINA_OPTS="-Dspring.profiles.active=prod -Dauthn-client.conf=/home/vcap/app/conf/authn-client.conf"
