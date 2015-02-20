@@ -6,6 +6,7 @@ set -e
 APACHE_HTTPD="https://www.dropbox.com/s/qllq85lc6s81ibi/apache-2.2.14-proxy.tar.gz"
 TOMCAT_CONTAINER="https://www.dropbox.com/s/1zzh5yvz05mljt9/tomcat.tar.gz"
 OPEN_JDK="https://s3.amazonaws.com/covisintrnd.com-software/jdk-8u25-linux-x64.gz"
+WEBAPP="https://s3.amazonaws.com/covisintrnd.com-software/sso.tar.gz"
 
 APACHE_PATH="apache-2.2.14-proxy"
 TOMCAT_PATH="tomcat"
@@ -35,6 +36,12 @@ mv $CACHE_DIR/conf .
 # create logs directory
 mkdir -p $CACHE_DIR/logs
 mv $CACHE_DIR/logs .
+
+# extract webapp directory root
+echo "-----> Bundling SSO webapp"
+curl --silent --max-time 60 --location $WEBAPP | tar xz
+cp $LP_DIR/conf/web.xml $WEBAPP_PATH/ROOT/WEB-INF
+cp $LP_DIR/conf/initial.properties $WEBAPP_PATH/ROOT/WEB-INF/classes
 
 # install Open JDK
 echo "-----> Bundling Open JDK"
