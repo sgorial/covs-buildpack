@@ -23,9 +23,9 @@ shopt -s dotglob
 cd $BUILD_DIR
 
 # webapp root
-#mkdir -p $CACHE_DIR/webroot
-#mv * $CACHE_DIR/webroot
-#mv $CACHE_DIR/webroot .
+mkdir -p $CACHE_DIR/webroot
+mv * $CACHE_DIR/webroot
+mv $CACHE_DIR/webroot .
 # create resources directory
 mkdir -p $CACHE_DIR/conf
 cp $LP_DIR/conf/webagent.conf $CACHE_DIR/conf
