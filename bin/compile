@@ -19,9 +19,9 @@ LP_DIR=`cd $(dirname $0); cd ..; pwd`
 cd $BUILD_DIR
 
 # create webapp root directory
-mkdir -p $CACHE_DIR/webroot/ROOT
-mv * $CACHE_DIR/webroot/ROOT
-mv $CACHE_DIR/webroot/ROOT .
+mkdir -p $CACHE_DIR/webroot
+mv * $CACHE_DIR/webroot
+mv $CACHE_DIR/webroot .
 
 # create resource directory
 mkdir -p $CACHE_DIR/conf
