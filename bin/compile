@@ -29,6 +29,7 @@ mv $CACHE_DIR/webroot .
 mkdir -p $CACHE_DIR/conf
 cp $LP_DIR/conf/webagent.conf $CACHE_DIR/conf
 cp $LP_DIR/conf/workers.properties $CACHE_DIR/conf
+cp $LP_DIR/conf/authn-client.conf $CACHE_DIR/conf
 mv $CACHE_DIR/conf .
 # create logs directory
 mkdir -p $CACHE_DIR/logs
@@ -60,7 +61,7 @@ done
 
 touch /app/${APACHE_PATH}/logs/error_log
 touch /app/${APACHE_PATH}/logs/access_log
-#touch /app/logs/sso.log
+touch /app/logs/sso.log
 touch /app/logs/mod_jk.log
 tail -F /app/${APACHE_PATH}/logs/error_log &
 tail -F /app/${APACHE_PATH}/logs/access_log &
