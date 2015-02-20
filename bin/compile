@@ -49,7 +49,6 @@ cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
 echo "-----> Bundling Tomcat container"
 curl --silent --max-time 60 --location $TOMCAT_CONTAINER | tar xz
 cp $LP_DIR/conf/server.xml $TOMCAT_PATH/conf
-cp $LP_DIR/conf/workers.properties $TOMCAT_PATH/conf
 
 cat >>boot.sh <<EOF
 export LD_LIBRARY_PATH=/app/${APACHE_PATH}/lib:$LD_LIBRARY_PATH
@@ -70,6 +69,7 @@ tail -F /app/${APACHE_PATH}/logs/error_log &
 tail -F /app/${APACHE_PATH}/logs/access_log &
 
 #echo "Starting Tomcat..."
+export CATALINA_OPTS="-Dspring.profiles.active=prod -Dauthn-client.conf=/home/vcap/app/conf/authn-client.conf"
 exec /app/${TOMCAT_PATH}/bin/catalina.sh start &
 
 echo "Launching Apache HTTPd..."
