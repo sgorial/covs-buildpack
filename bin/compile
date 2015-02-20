@@ -20,8 +20,8 @@ cd $BUILD_DIR
 
 # create webapp root directory
 mkdir -p $CACHE_DIR
-cp * $CACHE_DIR
-cp $CACHE_DIR .
+mv * $CACHE_DIR
+mv $CACHE_DIR .
 
 # create resource directory
 mkdir -p $CACHE_DIR/conf
@@ -66,8 +66,6 @@ touch /app/logs/sso.log
 touch /app/logs/mod_jk.log
 tail -F /app/${APACHE_PATH}/logs/error_log &
 tail -F /app/${APACHE_PATH}/logs/access_log &
-tail -F /app/logs/sso.log &
-tail -F /app/logs/mod_jk.log &
 
 #echo "Starting Tomcat..."
 export CATALINA_OPTS="-Dspring.profiles.active=prod -Dauthn-client.conf=/home/vcap/app/conf/authn-client.conf"
