@@ -20,8 +20,8 @@ cd $BUILD_DIR
 
 # create webapp root directory
 mkdir -p $CACHE_DIR
-mv * $CACHE_DIR
-mv $CACHE_DIR .
+cp * $CACHE_DIR
+cp $CACHE_DIR .
 
 # create resource directory
 mkdir -p $CACHE_DIR/conf
